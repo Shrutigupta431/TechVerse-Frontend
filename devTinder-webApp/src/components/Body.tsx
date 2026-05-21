@@ -1,7 +1,7 @@
 import { useEffect, type FC } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Navbar } from "./NavBar";
-import Foter from "./Foter";
+import Foter from "./Footer";
 import { BASE_URL } from "../utils/constants/url";
 import axios, { type AxiosError } from "axios";
 import { addUser } from "../utils/slices/userSlice";
@@ -40,12 +40,29 @@ const Body: FC = () => {
   }, []);
 
   return (
-    <div>
-      <Navbar />
-      <Outlet />
-      <Foter />
+    <div className="min-h-screen bg-base-200">
+      <div className="relative overflow-hidden">
+        {/* Ambient background glow */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            background:
+              "radial-gradient(800px circle at 20% 10%, rgba(99,102,241,0.35), transparent 55%), radial-gradient(900px circle at 85% 30%, rgba(236,72,153,0.25), transparent 60%), radial-gradient(800px circle at 50% 95%, rgba(34,197,94,0.18), transparent 55%)",
+          }}
+        />
+
+        <div className="relative">
+          <Navbar />
+          <div className="devtinder-anim-fade-up">
+            <Outlet />
+          </div>
+          <Foter />
+        </div>
+      </div>
     </div>
   );
 };
 
 export default Body;
+

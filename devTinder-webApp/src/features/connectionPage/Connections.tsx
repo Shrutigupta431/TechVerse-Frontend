@@ -5,29 +5,49 @@ import { BASE_URL } from "../../utils/constants/url";
 import { addConnections } from "../../utils/slices/connectionSlice";
 import type { RootState } from "../../types/store.types";
 import type { User } from "../../types/user.types";
+import {
+  Search,
+  Users,
+  Sparkles,
+  MessageCircle,
+  Eye,
+  Code2,
+} from "lucide-react";
 
 const placeholderImage =
   "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp";
 
 const Connections: FC = () => {
   const dispatch = useDispatch();
-  const connections = useSelector((store: RootState) => store.connection) as
-    | User[]
-    | null;
+
+  const connections = useSelector(
+    (store: RootState) => store.connection
+  ) as User[] | null;
+
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const filteredConnections = useMemo(() => {
     if (!connections) return null;
+
     const query = search.trim().toLowerCase();
+
     if (!query) return connections;
 
     return connections.filter((connection) => {
-      const fullName = `${connection.firstName ?? ""} ${connection.lastName ?? ""}`.toLowerCase();
+      const fullName =
+        `${connection.firstName ?? ""} ${
+          connection.lastName ?? ""
+        }`.toLowerCase();
+
       const email = (connection.emailId ?? "").toLowerCase();
+
       const about = (connection.about ?? "").toLowerCase();
-      const skills = (connection.skills ?? []).join(" ").toLowerCase();
+
+      const skills = (connection.skills ?? [])
+        .join(" ")
+        .toLowerCase();
 
       return (
         fullName.includes(query) ||
@@ -43,13 +63,20 @@ const Connections: FC = () => {
     setError(null);
 
     try {
-      const res = await axios.get(BASE_URL + "/user/connections", {
-        withCredentials: true,
-      });
+      const res = await axios.get(
+        BASE_URL + "/user/connections",
+        {
+          withCredentials: true,
+        }
+      );
+
       dispatch(addConnections(res?.data?.data));
     } catch (err) {
       console.error(err);
-      setError("Unable to load connections. Please try again later.");
+
+      setError(
+        "Unable to load connections. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
@@ -60,153 +87,309 @@ const Connections: FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-base-200 px-4 py-8">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <section className="overflow-hidden rounded-[30px] bg-gradient-to-r from-primary via-secondary to-accent p-6 shadow-2xl text-white">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm uppercase tracking-[0.4em] opacity-90">
-                My Connections
-              </p>
-              <h1 className="mt-3 text-4xl font-bold leading-tight">
-                Your network is growing.
-              </h1>
-              <p className="mt-4 text-base opacity-90">
-                Discover your saved connections, explore what they bring to the
-                table, and keep your network organized in one beautiful place.
-              </p>
-            </div>
-            <div className="rounded-3xl bg-white/10 p-6 shadow-xl backdrop-blur-md">
-              <p className="text-sm uppercase tracking-[0.3em] text-white/80">
-                Total profiles
-              </p>
-              <p className="mt-2 text-4xl font-bold">
-                {connections?.length ?? 0}
-              </p>
-            </div>
-          </div>
-        </section>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#111827] via-[#172554] to-[#0f172a] px-5 py-10 text-white">
+      
+      {/* Background Glow */}
+      <div className="absolute left-[-100px] top-20 h-96 w-96 animate-pulse rounded-full bg-cyan-500/20 blur-3xl"></div>
 
-        <section className="grid gap-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex-1">
+      <div className="absolute bottom-10 right-[-100px] h-96 w-96 animate-pulse rounded-full bg-purple-500/20 blur-3xl"></div>
+
+      {/* Grid Background */}
+      <div className="absolute inset-0 opacity-[0.05] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+
+      <div className="relative z-10 mx-auto max-w-6xl">
+        
+       {/* Hero Section */}
+<section
+  className="
+    overflow-hidden rounded-[28px]
+    border border-white/10 bg-white/5
+    p-5 shadow-2xl backdrop-blur-xl
+  "
+>
+  
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    
+    {/* Left */}
+    <div className="max-w-2xl">
+      
+      {/* Badge */}
+      <div
+        className="
+          mb-3 inline-flex items-center gap-2
+          rounded-full border border-cyan-400/20
+          bg-cyan-500/10 px-4 py-1.5
+        "
+      >
+        
+        <Sparkles
+          size={14}
+          className="animate-spin text-cyan-400"
+          style={{ animationDuration: "4s" }}
+        />
+
+        <p className="text-xs font-medium tracking-wide text-cyan-300">
+          Developer Network
+        </p>
+      </div>
+
+      {/* Heading */}
+      <h1
+        className="
+          bg-gradient-to-r from-cyan-300
+          via-blue-400 to-purple-400
+          bg-clip-text text-2xl
+          font-extrabold text-transparent
+        "
+      >
+        My Connections
+      </h1>
+
+      {/* Description */}
+      <p className="mt-2 max-w-xl text-sm leading-6 text-slate-300">
+        Connect, collaborate, and grow your developer network 🚀
+      </p>
+    </div>
+
+    {/* Compact Stats */}
+    <div
+      className="
+        flex items-center gap-4 rounded-2xl
+        border border-cyan-400/20
+        bg-cyan-500/10 px-5 py-4
+        shadow-lg backdrop-blur-md
+      "
+    >
+      
+      <div className="rounded-full bg-cyan-500/20 p-3">
+        <Users size={24} className="text-cyan-400" />
+      </div>
+
+      <div>
+        
+        <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
+          Connections
+        </p>
+
+        <p className="text-2xl font-extrabold text-white">
+          {connections?.length ?? 0}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+        {/* Search */}
+        <section className="mt-10">
+          
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            
+            <div className="relative w-full md:max-w-xl">
+              
+              <Search
+                size={20}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400"
+              />
+
               <input
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by name, email, skill or bio"
-                className="input input-bordered w-full"
+                placeholder="Search developers, skills, bio..."
+                className="
+                  w-full rounded-2xl border border-white/10
+                  bg-white/5 py-4 pl-12 pr-4
+                  text-white outline-none
+                  backdrop-blur-lg transition duration-300
+                  placeholder:text-slate-400
+                  focus:border-cyan-400/50
+                  focus:bg-white/10
+                "
               />
             </div>
-            <div className="text-sm text-gray-500">
-              Showing {filteredConnections?.length ?? 0} of{" "}
-              {connections?.length ?? 0}
+
+            <div className="text-sm text-slate-400">
+              Showing{" "}
+              <span className="font-bold text-cyan-300">
+                {filteredConnections?.length ?? 0}
+              </span>{" "}
+              of{" "}
+              <span className="font-bold text-cyan-300">
+                {connections?.length ?? 0}
+              </span>
             </div>
           </div>
-
-          {loading ? (
-            <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
-              <span className="loading loading-dots loading-lg"></span>
-            </div>
-          ) : error ? (
-            <div className="alert alert-error shadow-lg">{error}</div>
-          ) : !connections || connections.length === 0 ? (
-            <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
-              <p className="text-xl font-semibold">No connections yet</p>
-              <p className="mt-2 text-gray-500">
-                Once you connect with someone, their profile cards will appear
-                here.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6">
-              {filteredConnections?.map((connection) => (
-                <div
-                  key={
-                    connection._id ??
-                    `${connection.firstName}-${connection.emailId}`
-                  }
-                  className="mx-auto w-full max-w-4xl overflow-hidden rounded-[30px] border border-base-200 bg-base-100 shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                >
-                  <div className="rounded-t-[30px] bg-gradient-to-r from-primary via-secondary to-accent p-3 text-white shadow-inner">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="flex items-center gap-4">
-                       
-                        <div className="avatar">
-                          <div className="w-15 rounded-full ring ring-white/30 ring-offset-base-100 ring-offset-2">
-                            <img
-                              src={connection.photoUrl || placeholderImage}
-                              alt={`${connection.firstName} ${connection.lastName ?? ""}`}
-                            />
-                          </div>
-                        </div>
-                        {/* Name */}
-                        <div>
-                          <h2 className="text-xl font-semibold tracking-tight">
-                            {connection.firstName} {connection.lastName}
-                          </h2>
-                          <p className="text-sm opacity-90">
-                            {connection.emailId}
-                          </p>
-                          <p className="text-sm opacity-90">{connection.age}</p>
-                        </div>
-                      </div>
-
-                      <span className="badge badge-outline badge-lg text-sm border-white/40 text-white/95 bg-white/10">
-                        {connection.gender ?? "N/A"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="card-body p-3">
-                    {/* <div className="grid gap-3 sm:grid-cols-2 text-sm text-gray-600">
-                      <div className="rounded-3xl bg-base-200 p-3">
-                        <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Age</p>
-                        <p className="mt-1 text-lg font-semibold">{connection.age ?? "-"}</p>
-                      </div>
-                      <div className="rounded-3xl bg-base-200 p-2">
-                        <p className="text-xs uppercase tracking-[0.2em] text-gray-500">Joined</p>
-                        <p className="mt-1 text-lg font-semibold">
-                          {connection.createdAt ? new Date(connection.createdAt).toLocaleDateString() : "-"}
-                        </p>
-                      </div>
-                    </div> */}
-
-                    <p className="mt-1 text-sm text-gray-700 min-h-[2.5rem]">
-                      {connection.about ?? "No bio available."}
-                    </p>
-
-                    <div className="mt-1 flex flex-wrap gap-2">
-                      {connection.skills && connection.skills.length > 0 ? (
-                        connection.skills.map((skill, index) => (
-                          <span
-                            key={index}
-                            className="badge badge-secondary badge-outline"
-                          >
-                            {skill}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-gray-500">
-                          No skills listed
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="card-actions justify-end mt-1 gap-2">
-                      <button type="button" className="btn btn-sm btn-primary">
-                        Message
-                      </button>
-                      <button type="button" className="btn btn-sm btn-ghost">
-                        View profile
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
         </section>
+
+        {/* States */}
+        {loading ? (
+          <div className="mt-20 flex justify-center">
+            <span className="loading loading-spinner loading-lg text-cyan-400"></span>
+          </div>
+        ) : error ? (
+          <div className="mt-10 rounded-3xl border border-red-400/20 bg-red-500/10 p-5 text-center text-red-300 backdrop-blur-xl">
+            {error}
+          </div>
+        ) : !connections || connections.length === 0 ? (
+          <div className="mt-16 rounded-[35px] border border-white/10 bg-white/5 p-12 text-center shadow-2xl backdrop-blur-xl">
+            
+            <Users
+              size={60}
+              className="mx-auto text-cyan-400"
+            />
+
+            <h2 className="mt-6 text-3xl font-bold">
+              No Connections Yet
+            </h2>
+
+            <p className="mt-4 text-slate-400">
+              Once you connect with developers, they’ll appear
+              here ✨
+            </p>
+          </div>
+        ) : (
+          <div className="mt-10 grid gap-8">
+            
+            {filteredConnections?.map((connection, index) => (
+             <>
+             {/* Connection Card */}
+<div
+  key={
+    connection._id ??
+    `${connection.firstName}-${connection.emailId}`
+  }
+  className="
+    group overflow-hidden rounded-[28px]
+    border border-white/10 bg-white/5
+    shadow-2xl backdrop-blur-xl
+    transition duration-500
+    hover:-translate-y-1
+    hover:border-cyan-400/30
+    hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
+    animate-cardReveal
+  "
+  style={{
+    animationDelay: `${index * 0.08}s`,
+  }}
+>
+  
+  {/* Compact Layout */}
+  <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center lg:justify-between">
+    
+    {/* Left */}
+    <div className="flex items-center gap-4">
+      
+      {/* Image */}
+      <div className="relative shrink-0">
+        
+        <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg"></div>
+
+        <img
+          src={connection.photoUrl || placeholderImage}
+          alt={`${connection.firstName}`}
+          className="
+            relative z-10 h-20 w-20 rounded-full
+            border-2 border-cyan-400/40
+            object-cover
+          "
+        />
+      </div>
+
+      {/* Info */}
+      <div>
+        
+        <div className="flex flex-wrap items-center gap-3">
+          
+          <h2 className="text-2xl font-bold text-white">
+            {connection.firstName}{" "}
+            <span className="text-cyan-400">
+              {connection.lastName}
+            </span>
+          </h2>
+
+          <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300">
+            Developer
+          </div>
+        </div>
+
+        <p className="mt-1 text-sm text-slate-400">
+          {connection.emailId}
+        </p>
+
+        <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-slate-300">
+          {connection.about ||
+            "Passionate developer building modern applications 🚀"}
+        </p>
+
+        {/* Skills */}
+        <div className="mt-3 flex flex-wrap gap-2">
+          
+          {connection.skills &&
+          connection.skills.length > 0 ? (
+            connection.skills
+              .slice(0, 5)
+              .map((skill, index) => (
+                <span
+                  key={index}
+                  className="
+                    rounded-full border border-cyan-400/20
+                    bg-cyan-500/10 px-3 py-1
+                    text-xs font-medium text-cyan-300
+                    transition duration-300
+                    hover:bg-cyan-500/20
+                  "
+                >
+                  {skill}
+                </span>
+              ))
+          ) : (
+            <span className="text-xs text-slate-400">
+              No skills listed
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+
+    {/* Right Actions */}
+    <div className="flex items-center gap-3 self-end lg:self-center">
+      
+      <button
+        type="button"
+        className="
+          flex items-center gap-2 rounded-full
+          border border-white/10 bg-white/5
+          px-4 py-2 text-sm text-slate-300
+          transition duration-300
+          hover:border-cyan-400/30
+          hover:bg-cyan-500/10
+          hover:text-cyan-300
+        "
+      >
+        <Eye size={16} />
+        View
+      </button>
+
+      <button
+        type="button"
+        className="
+          flex items-center gap-2 rounded-full
+          bg-cyan-500 px-5 py-2
+          text-sm font-semibold text-white
+          transition duration-300
+          hover:scale-105 hover:bg-cyan-400
+        "
+      >
+        <MessageCircle size={16} />
+        Message
+      </button>
+    </div>
+  </div>
+</div>
+             </>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

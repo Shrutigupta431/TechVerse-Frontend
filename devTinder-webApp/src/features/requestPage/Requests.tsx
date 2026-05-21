@@ -6,6 +6,7 @@ import { BASE_URL } from "../../utils/constants/url";
 import { addRequest, removeRequest } from "../../utils/slices/requestSlice";
 import type { RootState } from "../../types/store.types";
 import type { User } from "../../types/user.types";
+import { User as Profile } from "lucide-react";
 
 const placeholderImage =
   "https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp";
@@ -44,7 +45,7 @@ const Requests = () => {
     });
   }, [requestList, search]);
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -61,12 +62,13 @@ const Requests = () => {
       setLoading(false);
     }
   };
-  console.log("requestList",requestList)
 
-  const reviewRequest = async (status, _id) => {
-    console.log("_id",_id)
+  console.log("requestList", requestList);
+
+  const reviewRequest = async (status: string, _id: string): Promise<void> => {
+    console.log("_id", _id);
     try {
-      const res = await axios.post(
+      await axios.post(
         BASE_URL + "/request/review/" + status + "/" + _id,
         {},
         { withCredentials: true },
@@ -74,126 +76,239 @@ const Requests = () => {
       dispatch(removeRequest(_id));
     } catch (err) {}
   };
+
   useEffect(() => {
     fetchRequests();
   }, []);
 
   return (
-    <div className="min-h-screen bg-base-200 px-4 py-8" data-theme="dark">
-      <div className="mx-auto max-w-5xl space-y-8">
-        <section className="overflow-hidden rounded-[30px] bg-gradient-to-r from-primary via-secondary to-accent p-6 shadow-2xl text-white">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-3xl">
-              <p className="text-sm uppercase tracking-[0.4em] opacity-90">
-                Connections Request
-              </p>
-            </div>
-            <div className="rounded-3xl bg-white/10 p-6 shadow-xl backdrop-blur-md">
-              <p className="text-sm uppercase tracking-[0.3em] text-white/80">
-                Total profiles {requestList?.length ?? 0}
-              </p>
-            </div>
-          </div>
-        </section>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#111827] via-[#172554] to-[#0f172a] px-5 py-10 text-white">
+      <div className="devtinder-anim-fade-up">
+        <div className="mx-auto max-w-5xl space-y-8">
+         <section
+  className="
+    overflow-hidden rounded-[28px]
+    border border-white/10 bg-white/5
+    p-5 shadow-2xl backdrop-blur-xl
+  "
+>
+  
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    
+    <div className="max-w-2xl">
+      
+      <p
+        className="
+          mb-2 inline-flex rounded-full
+          border border-cyan-400/20
+          bg-cyan-500/10 px-4 py-1
+          text-xs font-medium tracking-wide text-cyan-300
+        "
+      >
+        Developer Requests
+      </p>
 
-        <section className="grid gap-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-gray-500">
-              Showing {requestList?.length ?? 0} of {requestList?.length ?? 0}
-            </div>
-          </div>
+      <h1
+        className="
+          bg-gradient-to-r from-cyan-300
+          via-blue-400 to-purple-400
+          bg-clip-text text-2xl
+          font-extrabold text-transparent
+        "
+      >
+        Connection Requests
+      </h1>
 
-          {loading ? (
-            <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
-              <span className="loading loading-dots loading-lg"></span>
+      <p className="mt-2 text-sm text-slate-300">
+        Accept requests and grow your tech network 🚀
+      </p>
+    </div>
+
+    <div
+      className="
+        flex items-center gap-4 rounded-2xl
+        border border-cyan-400/20
+        bg-cyan-500/10 px-5 py-4
+        shadow-lg backdrop-blur-md
+      "
+    >
+      
+      <div className="rounded-full bg-cyan-500/20 p-3">
+        <Profile size={24} className="text-cyan-400" />
+      </div>
+
+      <div>
+        
+        <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
+          Requests
+        </p>
+
+        <p className="text-2xl font-extrabold text-white">
+          {requestList?.length ?? 0}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+          <section className="grid gap-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-sm text-gray-500">
+                Showing {requestList?.length ?? 0} of {requestList?.length ?? 0}
+              </div>
             </div>
-          ) : error ? (
-            <div className="alert alert-error shadow-lg">{error}</div>
-          ) : !requestList || requestList.length === 0 ? (
-            <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
-              <p className="text-xl font-semibold">No connections yet</p>
-              <p className="mt-2 text-gray-500">
-                Once you connect with someone, their profile cards will appear
-                here.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-6">
-              {((filteredRequests ?? requestList) as any[])?.map(
-                (connection) => (
-                  <div
-                    key={
-                      connection.fromUserId._id ??
-                      `${connection.fromUserId.firstName}-${connection.fromUserId.emailId}`
-                    }
-                    className="mx-auto w-full max-w-4xl overflow-hidden rounded-[30px] border border-base-200 bg-base-100 shadow-2xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                  >
-                    <div className="rounded-t-[30px] bg-gradient-to-r from-primary via-secondary to-accent p-3 text-white shadow-inner">
-                      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="flex items-center gap-6">
-                          <div className="avatar">
-                            <div className="w-15 rounded-full ring ring-white/30 ring-offset-base-100 ring-offset-2">
-                              <img
-                                src={
-                                  connection.fromUserId.photoUrl ||
-                                  placeholderImage
-                                }
-                                alt={`${connection.fromUserId.firstName} ${connection.fromUserId.lastName ?? ""}`}
-                              />
-                            </div>
+
+            {loading ? (
+              <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
+                <span className="loading loading-dots loading-lg"></span>
+              </div>
+            ) : error ? (
+              <div className="alert alert-error shadow-lg">{error}</div>
+            ) : !requestList || requestList.length === 0 ? (
+              <div className="rounded-3xl bg-base-100 p-10 text-center shadow-lg">
+                <p className="text-xl font-semibold">No connections yet</p>
+                <p className="mt-2 text-gray-500">
+                  Once you connect with someone, their profile cards will appear
+                  here.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-5">
+                {((filteredRequests ?? requestList) as any[])?.map(
+                  (connection, index) => (
+                    <div
+                      key={
+                        connection.fromUserId._id ??
+                        `${connection.fromUserId.firstName}-${connection.fromUserId.emailId}`
+                      }
+                      className="
+          group mx-auto w-full max-w-4xl
+          overflow-hidden rounded-[28px]
+          border border-white/10
+          bg-white/5
+          shadow-2xl backdrop-blur-xl
+          transition duration-500
+          hover:-translate-y-1
+          hover:border-cyan-400/30
+          hover:shadow-[0_0_30px_rgba(34,211,238,0.18)]
+          animate-cardReveal
+        "
+                      style={{
+                        animationDelay: `${index * 0.08}s`,
+                      }}
+                    >
+                      <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center lg:justify-between">
+                        {/* LEFT SECTION */}
+                        <div className="flex items-center gap-4">
+                          {/* Image */}
+                          <div className="relative shrink-0">
+                            <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg"></div>
+
+                            <img
+                              src={
+                                connection.fromUserId.photoUrl ||
+                                placeholderImage
+                              }
+                              alt={`${connection.fromUserId.firstName}`}
+                              className="
+                  relative z-10 h-20 w-20 rounded-full
+                  border-2 border-cyan-400/40
+                  object-cover
+                "
+                            />
                           </div>
-                          {/* Name */}
-                          <span>
-                            <h2 className="text-xl font-semibold tracking-tight">
-                              {connection.fromUserId.firstName}{" "}
-                              {connection.fromUserId.lastName}
-                            </h2>
-                            <p className="text-sm font-semibold tracking-tight">
-                              {connection.fromUserId.about}{" "}
+
+                          {/* Info */}
+                          <div>
+                            <div className="flex flex-wrap items-center gap-3">
+                              <h2 className="text-2xl font-bold text-white">
+                                {connection.fromUserId.firstName}{" "}
+                                <span className="text-cyan-400">
+                                  {connection.fromUserId.lastName}
+                                </span>
+                              </h2>
+
+                              <div
+                                className="
+                    rounded-full border border-cyan-400/20
+                    bg-cyan-500/10 px-3 py-1
+                    text-xs text-cyan-300
+                  "
+                              >
+                                Developer
+                              </div>
+                            </div>
+
+                            <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-slate-300">
+                              {connection.fromUserId.about ||
+                                "Passionate developer building amazing products 🚀"}
                             </p>
-                          </span>
+                          </div>
                         </div>
 
-                        <span className="card-actions justify-end mt-1 gap-2">
+                        {/* ACTION BUTTONS */}
+                        <div className="flex flex-wrap items-center gap-3 self-end lg:self-center">
+                          {/* Reject */}
                           <button
                             type="button"
-                            className="btn btn-sm btn-primary"
                             onClick={() =>
-                              reviewRequest(
-                                "rejected",
-                                connection._id,
-                              )
+                              reviewRequest("rejected", connection._id)
                             }
+                            className="
+                rounded-full border border-red-400/20
+                bg-red-500/10 px-5 py-2
+                text-sm font-medium text-red-300
+                transition duration-300
+                hover:scale-105
+                hover:bg-red-500
+                hover:text-white
+              "
                           >
                             Reject
                           </button>
+
+                          {/* Accept */}
                           <button
                             type="button"
-                            className="btn btn-sm btn-primary"
                             onClick={() =>
-                              reviewRequest(
-                                "accepted",
-                                connection._id,
-                              )
+                              reviewRequest("accepted", connection._id)
                             }
+                            className="
+                rounded-full bg-cyan-500
+                px-5 py-2 text-sm
+                font-semibold text-white
+                transition duration-300
+                hover:scale-105
+                hover:bg-cyan-400
+              "
                           >
                             Accept
                           </button>
+
+                          {/* View */}
                           <button
                             type="button"
-                            className="btn btn-sm btn-ghost"
+                            className="
+                rounded-full border border-white/10
+                bg-white/5 px-5 py-2
+                text-sm text-slate-300
+                transition duration-300
+                hover:border-cyan-400/30
+                hover:bg-cyan-500/10
+                hover:text-cyan-300
+              "
                           >
-                            View profile
+                            View Profile
                           </button>
-                        </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ),
-              )}
-            </div>
-          )}
-        </section>
+                  ),
+                )}
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   );

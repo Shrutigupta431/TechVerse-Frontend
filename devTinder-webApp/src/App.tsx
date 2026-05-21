@@ -8,6 +8,7 @@ import { appStore } from "./utils/store/appStore";
 import Feed from "./features/feedPage/Feed";
 import { type FC } from "react";
 import Connections from "./features/connectionPage/Connections";
+
 import Requests from "./features/requestPage/Requests";
 
 const App: FC = () => {
