@@ -63,10 +63,7 @@ const Requests = () => {
     }
   };
 
-  console.log("requestList", requestList);
-
   const reviewRequest = async (status: string, _id: string): Promise<void> => {
-    console.log("_id", _id);
     try {
       await axios.post(
         BASE_URL + "/request/review/" + status + "/" + _id,

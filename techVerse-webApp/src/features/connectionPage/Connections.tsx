@@ -33,7 +33,7 @@ const Connections: FC = () => {
 
       setUnreadCounts(res.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
   useEffect(() => {
@@ -89,7 +89,7 @@ const Connections: FC = () => {
     fetchConnections();
   }, []);
 
-  console.log("unreadCounts", unreadCounts);
+ 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#111827] via-[#172554] to-[#0f172a] px-5 py-10 text-white">
       {/* Background Glow */}

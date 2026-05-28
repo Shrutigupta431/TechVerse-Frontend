@@ -14,7 +14,6 @@ const EditProfile: FC = () => {
   const user = useSelector((store: RootState) => store.user) as User | null;
   const dispatch = useDispatch();
   const navigate = useNavigate();
-console.log("user",user)
 
   const normalizeGender = (gender?: string) => {
     if (!gender) return "";

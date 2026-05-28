@@ -178,7 +178,7 @@ const Chat = () => {
 
     socket.on("receiveMessage", handleReceiveMessage);
     socket.on("messageDelivered", (data: any) => {
-      console.log("messageDelivered", data);
+     
       setMessages((prev) =>
         prev.map((m) =>
           m.messageId === data.messageId
@@ -193,7 +193,7 @@ const Chat = () => {
       );
     });
     socket.on("messageSeen", (data: any) => {
-      console.log("messageSeen", data);
+     
       setMessages((prev) =>
         prev.map((m) =>
           m.messageId === data.messageId
@@ -281,7 +281,7 @@ const Chat = () => {
       targetUserId,
     });
   };
-  console.log("messages", lastSeen, isOnline);
+ 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-br from-[#140152] via-[#22007C] to-[#05010E] flex items-center justify-center p-4 relative">
       {/* BACKGROUND BUBBLES */}

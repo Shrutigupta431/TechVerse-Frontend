@@ -15,7 +15,6 @@ const Profile: FC = () => {
   const user = useSelector(
     (store: RootState) => store?.user
   ) as User | null;
-console.log("user",user)
   const navigate = useNavigate();
 
   if (!user) {
