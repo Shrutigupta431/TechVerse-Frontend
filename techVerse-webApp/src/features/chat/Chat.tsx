@@ -14,25 +14,25 @@ import axios from "axios";
 import { BASE_URL } from "../../utils/constants/url";
 
 type MessageType = {
+  messageId?: string;
   firstName?: string;
   text: string;
   sender: "me" | "other";
   time: string;
+  deliveredAt?: string | null;
+  seenAt?: string | null;
 };
+
 
 type ReceiveMessageType = {
   firstName?: string;
   text: string;
   userId: string;
+  messageId?: string;
+  deliveredAt?: string | Date | null;
+  seenAt?: string | Date | null;
 };
-type ChatMessage = {
-  senderId: {
-    firstName: string;
-    lastName: string;
-  };
 
-  text: string;
-};
 const Chat = () => {
   const { targetUserId } = useParams();
 
@@ -65,18 +65,27 @@ const Chat = () => {
       const chat = await axios.get(BASE_URL + "/chat/" + targetUserId, {
         withCredentials: true,
       });
-      console.log("chat", chat?.data.messages);
 
-      const textArray = chat?.data?.messages?.map((msg: ChatMessage) => {
+      const textArray = chat?.data?.messages?.map((msg: any) => {
         return {
-          firstName: msg?.senderId.firstName,
-          lastName: msg?.senderId.lastName,
-          text: msg.text,
+          messageId: msg?._id,
+          firstName: msg?.senderId?.firstName,
+          text: msg?.text,
+          sender: msg?.senderId?._id === userId ? "me" : "other",
+          time: new Date(msg?.createdAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          deliveredAt: msg?.deliveredAt,
+          seenAt: msg?.seenAt,
         };
       });
 
       setMessages(textArray);
-    } catch (err) {}
+
+    } catch {
+      // ignore
+    }
   };
   const fetchUserStatus = async () => {
     try {
@@ -87,16 +96,16 @@ const Chat = () => {
       if (res.data.lastSeen) {
         setLastSeen(new Date(res.data.lastSeen).toLocaleString());
       }
-    } catch (err) {
-      console.log(err);
+    } catch {
+      // ignore
     }
   };
   useEffect(() => {
     if (!targetUserId) return;
 
-    fetchChatMessages();
+    fetchChatMessages().catch(() => undefined);
+    fetchUserStatus().catch(() => undefined);
 
-    fetchUserStatus();
   }, [targetUserId]);
 
   // SOCKET CONNECTION
@@ -118,12 +127,13 @@ const Chat = () => {
     // Ensure correct initial online state even if backend doesn't emit the event
     fetchUserStatus();
 
-    const handleReceiveMessage = (data: ReceiveMessageType) => {
+    const handleReceiveMessage = (data: any) => {
       setTyping(false);
 
       setMessages((prev) => [
         ...prev,
         {
+          messageId: data.messageId,
           firstName: data.firstName,
           text: data.text,
           sender: data.userId === userId ? "me" : "other",
@@ -131,9 +141,25 @@ const Chat = () => {
             hour: "2-digit",
             minute: "2-digit",
           }),
+          deliveredAt: data.deliveredAt ? new Date(data.deliveredAt).toISOString() : null,
+          seenAt: data.seenAt ? new Date(data.seenAt).toISOString() : null,
         },
+
       ]);
+      if (data.userId !== userId) {
+
+  socket.emit(
+    "messageDelivered",
+    {
+      userId,
+      targetUserId,
+      messageId:
+        data.messageId,
+    }
+  );
+}
     };
+
 
     const handleTyping = () => {
       setTyping(true);
@@ -158,9 +184,39 @@ const Chat = () => {
     };
 
     socket.on("receiveMessage", handleReceiveMessage);
+    socket.on("messageDelivered", (data: any) => {
+      console.log("messageDelivered", data);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.messageId === data.messageId
+            ? {
+                ...m,
+                deliveredAt: data.deliveredAt
+                  ? new Date(data.deliveredAt).toISOString()
+                  : m.deliveredAt,
+              }
+            : m,
+        ),
+      );
+    });
+    socket.on("messageSeen", (data: any) => {
+      console.log("messageSeen", data);
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.messageId === data.messageId
+            ? {
+                ...m,
+                seenAt: data.seenAt ? new Date(data.seenAt).toISOString() : m.seenAt,
+              }
+            : m,
+        ),
+      );
+    });
+
     socket.on("typing", handleTyping);
     socket.on("userOnline", handleUserOnline);
     socket.on("userOffline", handleUserOffline);
+
 
     return () => {
       socket.off("receiveMessage", handleReceiveMessage);
@@ -179,6 +235,32 @@ const Chat = () => {
       behavior: "smooth",
     });
   }, [messages, typing]);
+  useEffect(() => {
+
+  messages.forEach((msg) => {
+
+    if (
+      msg.sender === "other"
+      &&
+      !msg.seenAt
+      &&
+      msg.messageId
+    ) {
+
+      socketRef.current?.emit(
+        "messageSeen",
+        {
+          userId,
+          targetUserId,
+
+          messageId:
+            msg.messageId,
+        }
+      );
+    }
+  });
+
+}, [messages]);
 
   // SEND MESSAGE
   const sendMessage = () => {
@@ -273,9 +355,19 @@ const Chat = () => {
               >
                 <p className="text-[15px] break-words">{msg.text}</p>
 
-                <span className="text-[10px] text-gray-200 flex justify-end mt-1">
-                  {msg.time}
-                </span>
+                <div className="flex items-end justify-end gap-2 mt-1">
+                  <span className="text-[10px] text-gray-200">{msg.time}</span>
+                  {msg.sender === "me" && (
+                    <span className="text-[10px] text-gray-200">
+                      {msg.seenAt
+  ? "✓✓ Seen"
+  : msg.deliveredAt
+  ? "✓✓ Delivered"
+  : "✓ Sent"}
+                    </span>
+                  )}
+                </div>
+
               </div>
             </div>
           ))}

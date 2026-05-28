@@ -22,7 +22,21 @@ const Connections: FC = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unreadCounts, setUnreadCounts] = useState([]);
+  const fetchUnreadCounts = async () => {
+    try {
+      const res = await axios.get(BASE_URL + "/unread-counts", {
+        withCredentials: true,
+      });
 
+      setUnreadCounts(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    fetchUnreadCounts();
+  }, []);
   const filteredConnections = useMemo(() => {
     if (!connections) return null;
 
@@ -73,6 +87,7 @@ const Connections: FC = () => {
     fetchConnections();
   }, []);
 
+  console.log("unreadCounts", unreadCounts);
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#111827] via-[#172554] to-[#0f172a] px-5 py-10 text-white">
       {/* Background Glow */}
@@ -218,14 +233,17 @@ const Connections: FC = () => {
           </div>
         ) : (
           <div className="mt-10 grid gap-8">
-            {filteredConnections?.map((connection, index) => (
-              <>
-                {/* Connection Card */}
-                <div
-                  key={
-                   index
-                  }
-                  className="
+            {filteredConnections?.map((connection, index) => {
+              const unreadData = unreadCounts.find(
+                (u) => u.targetUserId === connection._id,
+              );
+
+              return (
+                <>
+                  {/* Connection Card */}
+                  <div
+                    key={index}
+                    className="
     group overflow-hidden rounded-[28px]
     border border-white/10 bg-white/5
     shadow-2xl backdrop-blur-xl
@@ -235,86 +253,87 @@ const Connections: FC = () => {
     hover:shadow-[0_0_30px_rgba(34,211,238,0.15)]
     animate-cardReveal
   "
-                  style={{
-                    animationDelay: `${index * 0.08}s`,
-                  }}
-                >
-                  {/* Compact Layout */}
-                  <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center lg:justify-between">
-                    {/* Left */}
-                    <div className="flex items-center gap-4">
-                      {/* Image */}
-                      <div className="relative shrink-0">
-                        <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg"></div>
+                    style={{
+                      animationDelay: `${index * 0.08}s`,
+                    }}
+                  >
+                    {/* Compact Layout */}
+                    <div className="flex flex-col gap-5 p-5 lg:flex-row lg:items-center lg:justify-between">
+                      {/* Left */}
+                      <div className="flex items-center gap-4">
+                        {/* Image */}
+                        <div className="relative shrink-0">
+                          <div className="absolute inset-0 rounded-full bg-cyan-400/20 blur-lg"></div>
 
-                        <img
-                          src={connection.photoUrl || placeholderImage}
-                          alt={`${connection.firstName}`}
-                          className="
+                          <img
+                            src={connection.photoUrl || placeholderImage}
+                            alt={`${connection.firstName}`}
+                            className="
             relative z-10 h-20 w-20 rounded-full
             border-2 border-cyan-400/40
             object-cover
           "
-                        />
-                      </div>
-
-                      {/* Info */}
-                      <div>
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h2 className="text-2xl font-bold text-white">
-                            {connection.firstName}{" "}
-                            <span className="text-cyan-400">
-                              {connection.lastName}
-                            </span>
-                          </h2>
-
-                          <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300">
-                            Developer
-                          </div>
+                          />
                         </div>
 
-                        <p className="mt-1 text-sm text-slate-400">
-                          {connection.emailId}
-                        </p>
+                        {/* Info */}
+                        <div>
+                          <div className="flex flex-wrap items-center gap-3">
+                            <h2 className="text-2xl font-bold text-white">
+                              {connection.firstName}{" "}
+                              <span className="text-cyan-400">
+                                {connection.lastName}
+                              </span>
+                            </h2>
 
-                        <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-slate-300">
-                          {connection.about ||
-                            "Passionate developer building modern applications 🚀"}
-                        </p>
+                            <div className="rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-1 text-xs text-cyan-300">
+                              Developer
+                            </div>
+                          </div>
 
-                        {/* Skills */}
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {connection.skills && connection.skills.length > 0 ? (
-                            connection.skills
-                              .slice(0, 5)
-                              .map((skill, index) => (
-                                <span
-                                  key={index}
-                                  className="
+                          <p className="mt-1 text-sm text-slate-400">
+                            {connection.emailId}
+                          </p>
+
+                          <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-6 text-slate-300">
+                            {connection.about ||
+                              "Passionate developer building modern applications 🚀"}
+                          </p>
+
+                          {/* Skills */}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {connection.skills &&
+                            connection.skills.length > 0 ? (
+                              connection.skills
+                                .slice(0, 5)
+                                .map((skill, index) => (
+                                  <span
+                                    key={index}
+                                    className="
                     rounded-full border border-cyan-400/20
                     bg-cyan-500/10 px-3 py-1
                     text-xs font-medium text-cyan-300
                     transition duration-300
                     hover:bg-cyan-500/20
                   "
-                                >
-                                  {skill}
-                                </span>
-                              ))
-                          ) : (
-                            <span className="text-xs text-slate-400">
-                              No skills listed
-                            </span>
-                          )}
+                                  >
+                                    {skill}
+                                  </span>
+                                ))
+                            ) : (
+                              <span className="text-xs text-slate-400">
+                                No skills listed
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-3 self-end lg:self-center">
-                      <button
-                        type="button"
-                        className="
+                      {/* Right Actions */}
+                      <div className="flex items-center gap-3 self-end lg:self-center">
+                        <button
+                          type="button"
+                          className="
           flex items-center gap-2 rounded-full
           border border-white/10 bg-white/5
           px-4 py-2 text-sm text-slate-300
@@ -323,30 +342,49 @@ const Connections: FC = () => {
           hover:bg-cyan-500/10
           hover:text-cyan-300
         "
-                      >
-                        <Eye size={16} />
-                        View
-                      </button>
+                        >
+                          <Eye size={16} />
+                          View
+                        </button>
 
-                      <Link
-                        to={`/chat/${connection._id}`}
-                         state={{ user: connection }}
-                        className="
+                        <Link
+                          to={`/chat/${connection._id}`}
+                          state={{ user: connection }}
+                          className="
           flex items-center gap-2 rounded-full
           bg-cyan-500 px-5 py-2
           text-sm font-semibold text-white
           transition duration-300
           hover:scale-105 hover:bg-cyan-400
         "
-                      >
-                        <MessageCircle size={16} />
-                        Message
-                      </Link>
+                        >
+                          <MessageCircle size={16} />
+                          Message
+                        </Link>
+                        {unreadData?.unreadCount > 0 && (
+                          <div
+                            className="
+                    bg-pink-500
+                    text-white
+                    text-xs
+                    font-bold
+                    min-w-[24px]
+                    h-6
+                    rounded-full
+                    flex items-center
+                    justify-center
+                    px-2
+                  "
+                          >
+                            {unreadData.unreadCount}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            ))}
+                </>
+              );
+            })}
           </div>
         )}
       </div>
